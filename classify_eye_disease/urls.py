@@ -3,5 +3,5 @@ from classify_eye_disease import views
 
 urlpatterns = [
 
-    path('', views.index, name='index'),
+    path('fish-analysis/', views.index, name='index'),
 ]
