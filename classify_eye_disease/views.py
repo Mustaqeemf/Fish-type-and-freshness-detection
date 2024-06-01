@@ -28,6 +28,8 @@ classify_classes = {
     8: 'Trout'
 }
 
+fresh_classes = ['fresh', 'non-fresh']
+
 
 def preprocess_image_classify(image_path, target_size=(224, 224)):
     try:
@@ -77,15 +79,15 @@ def predict_single_img_classify(img_path):
         return 'None'
 
 
-def predict_single_img_freshness(image_path, classes):
+def predict_single_img_freshness(image_path):
     freshness_model_load = load_freshness_model()
     test_image = preprocess_image_freshness(image_path)
     if test_image:
         test_image = test_image.reshape((1,) + test_image.shape)  # Reshape to match the input shape of the model
         prediction = freshness_model_load.predict(test_image)
         predicted_class_index = prediction.argmax(axis=-1)[0]
-        predicted_class = classes[predicted_class_index]
-        return True, predicted_class
+        predicted_class = fresh_classes[predicted_class_index]
+        return predicted_class
     else:
         return 'None'
 
