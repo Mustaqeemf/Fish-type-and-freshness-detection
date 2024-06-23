@@ -1,4 +1,6 @@
 import os
+import time
+
 import numpy as np
 import tensorflow as tf
 # from tensorflow.keras.models import Sequential,Model
@@ -71,36 +73,31 @@ def load_freshness_model():
 def predict_single_img_classify(img_path):
     classify_model_load = load_classify_model()
     test_image = preprocess_image_classify(img_path)
-    if test_image:
-        classify_predictions = classify_model_load.predict(test_image)
-        predicted_classify_index = np.argmax(classify_predictions, axis=1)[0]
-        return classify_classes[predicted_classify_index]
-    else:
-        return 'None'
+    classify_predictions = classify_model_load.predict(test_image)
+    predicted_classify_index = np.argmax(classify_predictions, axis=1)[0]
+    return classify_classes[predicted_classify_index]
 
 
 def predict_single_img_freshness(image_path):
     freshness_model_load = load_freshness_model()
     test_image = preprocess_image_freshness(image_path)
-    if test_image:
-        test_image = test_image.reshape((1,) + test_image.shape)  # Reshape to match the input shape of the model
-        prediction = freshness_model_load.predict(test_image)
-        predicted_class_index = prediction.argmax(axis=-1)[0]
-        predicted_class = fresh_classes[predicted_class_index]
-        return predicted_class
-    else:
-        return 'None'
+    test_image = test_image.reshape((1,) + test_image.shape)  # Reshape to match the input shape of the model
+    prediction = freshness_model_load.predict(test_image)
+    predicted_class_index = prediction.argmax(axis=-1)[0]
+    predicted_class = fresh_classes[predicted_class_index]
+    return predicted_class
 
 
-@api_view(['GET'])
+@api_view(['POST'])
 def index(request):
     fish_category = request.FILES['fish_category']
     fish_freshness = request.FILES['fish_freshness']
     fss = FileSystemStorage()
+    fss1 = FileSystemStorage()
     file = fss.save(fish_category.name, fish_category)
-    file1 = fss.save(fish_freshness.name, fish_freshness)
+    file1 = fss1.save(fish_freshness.name, fish_freshness)
     file_url = fss.url(file)
-    file_url_1 = fss.url(file1)
+    file_url_1 = fss1.url(file1)
     complete_path_classify = settings.MEDIA_FILE_PATH + file_url
     complete_path_freshness = settings.MEDIA_FILE_PATH + file_url_1
     img_result_classify = predict_single_img_classify(complete_path_classify)
